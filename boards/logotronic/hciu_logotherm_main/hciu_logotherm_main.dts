@@ -1,0 +1,153 @@
+/*
+ * HCIU Logotherm Main board - based on STM32F413ZG SoC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/dts-v1/;
+#include <st/f4/stm32f413Xg.dtsi>
+#include <st/f4/stm32f413z(g-h)tx-pinctrl.dtsi>
+// #include "arduino_r3_connector.dtsi"
+
+/ {
+	model = "HCIU Logotherm Main";
+	compatible = "logotronic,hciu-logotherm-main";
+
+	chosen {
+		zephyr,console = &usart6;
+		zephyr,sram = &sram0;
+		zephyr,flash = &flash0;
+	};
+
+	leds: leds {
+		compatible = "gpio-leds";
+		led_2: led_2 {
+			gpios = <&gpiog 4 GPIO_ACTIVE_HIGH>;
+			label = "User LD1";
+		};
+		led_3: led_3 {
+			gpios = <&gpiog 5 GPIO_ACTIVE_HIGH>;
+			label = "User LD2";
+		};
+		led_4: led_4 {
+			gpios = <&gpiog 7 GPIO_ACTIVE_HIGH>;
+			label = "User LD3";
+		};
+
+		led_5: led_5 {
+			gpios = <&gpiog 8 GPIO_ACTIVE_HIGH>;
+			label = "User LD4";
+		};
+		led_r: led_r {
+			gpios = <&gpiod 8 GPIO_ACTIVE_HIGH>;
+			label = "RGB Red";
+		};
+		led_g: led_g {
+			gpios = <&gpiod 9 GPIO_ACTIVE_HIGH>;
+			label = "RGB Green";
+		};
+		led_b: led_b {
+			gpios = <&gpiod 10 GPIO_ACTIVE_HIGH>;
+			label = "RGB Blue";
+		};
+	};
+
+	aliases {
+		led0 = &led_2;
+		led1 = &led_3;
+		led2 = &led_4;
+		led3 = &led_5;
+		ledr = &led_r;
+		ledg = &led_g;
+		ledb = &led_b;
+		relay0 = &relay_rs1;
+		relay1 = &relay_rs2;
+		relay2 = &relay_rs3_1;
+		relay3 = &relay_rs3_2;
+		relay4 = &relay_rs4_1;
+		relay5 = &relay_rs4_2;
+	};
+
+	relays: relays {
+		compatible = "gpio-leds";
+		relay_rs1: relay_rs1 {
+			gpios = <&gpiog 10 GPIO_ACTIVE_HIGH>;
+			label = "RS1";
+		};
+		relay_rs2: relay_rs2 {
+			gpios = <&gpiog 11 GPIO_ACTIVE_HIGH>;
+			label = "RS2";
+		};
+		relay_rs3_1: relay_rs3_1 {
+			gpios = <&gpiog 12 GPIO_ACTIVE_HIGH>;
+			label = "RS3_1";
+		};
+		relay_rs3_2: relay_rs3_2 {
+			gpios = <&gpiog 13 GPIO_ACTIVE_HIGH>;
+			label = "RS3_2";
+		};
+		relay_rs4_1: relay_rs4_1 {
+			gpios = <&gpiog 14 GPIO_ACTIVE_HIGH>;
+			label = "RS4_1";
+		};
+		relay_rs4_2: relay_rs4_2 {
+			gpios = <&gpiog 15 GPIO_ACTIVE_HIGH>;
+			label = "RS4_2";
+		};
+	};
+};
+
+&clk_hse {
+	clock-frequency = <DT_FREQ_M(8)>;
+	status = "okay";
+	/* Crystal oscillator (Y2, 8 MHz) — no hse-bypass */
+};
+
+&pll {
+	div-m = <4>;    /* VCO input = 8 MHz / 4 = 2 MHz */
+	mul-n = <192>;  /* VCO = 2 × 192 = 384 MHz      */
+	div-p = <4>;    /* SYSCLK = 384 / 4 = 96 MHz     */
+	div-q = <8>;    /* USB/SDIO = 384 / 8 = 48 MHz   */
+	clocks = <&clk_hse>;
+	status = "okay";
+};
+
+&rcc {
+	clocks = <&pll>;
+	clock-frequency = <DT_FREQ_M(96)>;
+	ahb-prescaler = <1>;
+	apb1-prescaler = <2>;  /* APB1 = 48 MHz (max 50 MHz) */
+	apb2-prescaler = <1>;  /* APB2 = 96 MHz              */
+};
+
+/* USART3 disabled: PD8/PD9 reassigned to RGB LED */
+&usart3 {
+	status = "disabled";
+};
+
+&usart6 {
+	/* Moved to PC6/PC7 — PG14 reassigned to relay RS4_1 */
+	pinctrl-0 = <&usart6_tx_pc6 &usart6_rx_pc7>;
+	pinctrl-names = "default";
+	current-speed = <115200>;
+	status = "okay";
+};
+
+&i2c1 {
+	status = "disabled";
+};
+
+&spi1 {
+	status = "disabled";
+};
+
+&usbotg_fs {
+	status = "disabled";
+};
+
+&timers2 {
+	status = "disabled";
+};
+
+&rtc {
+	status = "disabled";
+};

@@ -1,0 +1,39 @@
+{
+    "name": "Zephyr Development",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": ".."
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cpptools",
+                "ms-vscode.cmake-tools",
+                "twxs.cmake",
+                "eamodio.gitlens"
+            ]
+        }
+    },
+    // --privileged lets the container access USB devices forwarded from the host.
+    // On Windows/WSL 2 you must also forward the JLink USB device into WSL first:
+    //   1. Install usbipd-win: https://github.com/dorssel/usbipd-win/releases
+    //   2. In an elevated Windows terminal:
+    //        usbipd list                          <- find the JLink bus ID (e.g. 2-3)
+    //        usbipd attach --wsl --busid 2-3      <- attach before every session
+    //   3. The JLink will then appear in /dev/bus/usb inside the container.
+    //   4. Run ./flash.sh <target> — it calls JLinkExe directly, no host steps needed.
+    "runArgs": [
+        "--privileged",
+        "--network=host",
+        "--volume=/dev/bus/usb:/dev/bus/usb"
+    ],
+    "initializeCommand": "mkdir -p ${localEnv:HOME}/.ssh",
+    "mounts": [
+        "source=${localEnv:HOME}/.ssh,target=/root/.ssh,type=bind,consistency=cached"
+    ],
+    "postCreateCommand": "mkdir -p /root/.ssh && chmod 700 /root/.ssh && rm -f /root/.ssh/config",
+    "postStartCommand": "echo 'Host github.com\\n\\tStrictHostKeyChecking no' > /root/.ssh/config && chmod 600 /root/.ssh/config && (chmod 600 /root/.ssh/id_rsa* || true) && (chmod 644 /root/.ssh/*.pub || true)",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/Zephyr_Docker_project,type=bind",
+    "workspaceFolder": "/workspaces/Zephyr_Docker_project"
+}
+

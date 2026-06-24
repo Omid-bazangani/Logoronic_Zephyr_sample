@@ -1,0 +1,6 @@
+board:
+  name: hciu_logotherm_ble
+  full_name: HCIU Logotherm BLE
+  vendor: logotronic
+  socs:
+    - name: nrf52810

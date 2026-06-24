@@ -1,0 +1,14 @@
+/build/
+/.west/
+/modules/
+/zephyr/
+/bootloader/
+/tools/
+*.o
+*.a
+*.d
+*.cmd
+*.log
+/app/build/
+.DS_Store
+_build/

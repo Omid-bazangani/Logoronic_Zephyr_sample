@@ -1,0 +1,6 @@
+board:
+  name: hciu_logotherm_main
+  full_name: HCIU Logotherm Main
+  vendor: logotronic
+  socs:
+    - name: stm32f413xx

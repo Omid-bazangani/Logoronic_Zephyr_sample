@@ -1,0 +1,5 @@
+# HCIU Logotherm Main board configuration
+# SPDX-License-Identifier: Apache-2.0
+
+config BOARD_HCIU_LOGOTHERM_MAIN
+	select SOC_STM32F413XX

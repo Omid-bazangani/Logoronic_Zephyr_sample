@@ -1,0 +1,27 @@
+manifest:
+  version: "0.13"
+  remotes:
+    - name: zephyrproject-rtos
+      url-base: https://github.com/zephyrproject-rtos
+
+  projects:
+    - name: zephyr
+      remote: zephyrproject-rtos
+      revision: main
+      west-commands: scripts/west-commands.yml
+      import:
+        # Only include minimal required modules
+        name-allowlist:
+          - hal_nordic     # For nrf52840dk
+          - hal_stm32      # For blackpill_f411ce
+          - cmsis         # Core ARM CMSIS only
+      path-filters:
+        - -modules/fs/*           # Exclude filesystem modules
+        - -modules/crypto/*       # Exclude crypto modules
+        - -modules/debug/*        # Exclude debug modules
+        - -modules/lib/*          # Exclude library modules
+        - -tools/*               # Exclude tools
+        - +modules/hal/nordic/**  # Include Nordic HAL
+        - +modules/hal/stm32/**   # Include STM32 HAL
+        - +modules/hal/cmsis/**   # Include CMSIS
+        - -modules/hal/*          # Exclude other HAL modules
