@@ -42,12 +42,18 @@ RUN add-apt-repository -y ppa:deadsnakes/ppa && \
     && update-alternatives --set python3 /usr/bin/python3.12 \
     && curl -sS https://bootstrap.pypa.io/get-pip.py | python3.12
 
-# Install Python dependencies
-RUN pip3 install --no-cache-dir \
-    west \
-    pyelftools \
-    python-magic \
-    pylink-square
+# Install Zephyr's Python dependencies (jsonschema, pyyaml, pykwalify, west,
+# pyelftools, python-magic, pylink-square, etc.), pinned to the same Zephyr
+# release used by west.yml so the installed versions match what `west update`
+# would check out.
+ARG ZEPHYR_VERSION=v4.4.0
+RUN mkdir -p /tmp/zephyr-requirements && cd /tmp/zephyr-requirements && \
+    for f in requirements.txt requirements-base.txt requirements-build-test.txt \
+             requirements-run-test.txt requirements-extras.txt requirements-compliance.txt; do \
+        curl -fsSLO "https://raw.githubusercontent.com/zephyrproject-rtos/zephyr/${ZEPHYR_VERSION}/scripts/${f}"; \
+    done && \
+    pip3 install --no-cache-dir -r requirements.txt && \
+    cd / && rm -rf /tmp/zephyr-requirements
 
 # Set the Zephyr SDK version (Zephyr 4.4.x requires SDK 1.0.x)
 ENV ZEPHYR_SDK_VERSION=1.0.1
