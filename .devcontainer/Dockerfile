@@ -14,10 +14,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     dfu-util \
     device-tree-compiler \
     wget \
-    python3-pip \
-    python3-setuptools \
-    python3-wheel \
-    python3-dev \
+    software-properties-common \
     udev \
     xz-utils \
     file \
@@ -30,7 +27,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libusb-1.0-0 \
     curl \
     unzip \
+    ca-certificates \
+    gnupg \
     && rm -rf /var/lib/apt/lists/*
+
+# Install Python 3.12 via deadsnakes PPA (Zephyr 4.x requires Python >= 3.12)
+RUN add-apt-repository -y ppa:deadsnakes/ppa && \
+    apt-get update && apt-get install -y --no-install-recommends \
+    python3.12 \
+    python3.12-venv \
+    python3.12-dev \
+    && rm -rf /var/lib/apt/lists/* \
+    && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1 \
+    && update-alternatives --set python3 /usr/bin/python3.12 \
+    && curl -sS https://bootstrap.pypa.io/get-pip.py | python3.12
 
 # Install Python dependencies
 RUN pip3 install --no-cache-dir \
@@ -39,13 +49,13 @@ RUN pip3 install --no-cache-dir \
     python-magic \
     pylink-square
 
-# Set the Zephyr SDK version
-ENV ZEPHYR_SDK_VERSION=0.17.0
+# Set the Zephyr SDK version (Zephyr 4.4.x requires SDK 1.0.x)
+ENV ZEPHYR_SDK_VERSION=1.0.1
 
-# Download and install the complete Zephyr SDK
-RUN wget -q "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZEPHYR_SDK_VERSION}/zephyr-sdk-${ZEPHYR_SDK_VERSION}_linux-x86_64.tar.xz" && \
-    tar xf zephyr-sdk-${ZEPHYR_SDK_VERSION}_linux-x86_64.tar.xz -C /opt && \
-    rm zephyr-sdk-${ZEPHYR_SDK_VERSION}_linux-x86_64.tar.xz && \
+# Download and install the minimal Zephyr SDK bundle, then fetch only the arm-zephyr-eabi toolchain
+RUN wget -q "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZEPHYR_SDK_VERSION}/zephyr-sdk-${ZEPHYR_SDK_VERSION}_linux-x86_64_minimal.tar.xz" && \
+    tar xf zephyr-sdk-${ZEPHYR_SDK_VERSION}_linux-x86_64_minimal.tar.xz -C /opt && \
+    rm zephyr-sdk-${ZEPHYR_SDK_VERSION}_linux-x86_64_minimal.tar.xz && \
     /opt/zephyr-sdk-${ZEPHYR_SDK_VERSION}/setup.sh -t arm-zephyr-eabi
 
 # Set environment variables

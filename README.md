@@ -28,6 +28,9 @@ west init -l .
 # Update only required modules
 west update
 
+# Install Zephyr's Python dependencies (jsonschema, pyyaml, pykwalify, etc.)
+pip3 install -r /workspaces/zephyr/scripts/requirements.txt
+
 # Configure Zephyr modules
 west zephyr-export
 ```

@@ -31,8 +31,8 @@
     "mounts": [
         "source=${localEnv:HOME}/.ssh,target=/root/.ssh,type=bind,consistency=cached"
     ],
-    "postCreateCommand": "mkdir -p /root/.ssh && chmod 700 /root/.ssh && rm -f /root/.ssh/config",
-    "postStartCommand": "echo 'Host github.com\\n\\tStrictHostKeyChecking no' > /root/.ssh/config && chmod 600 /root/.ssh/config && (chmod 600 /root/.ssh/id_rsa* || true) && (chmod 644 /root/.ssh/*.pub || true)",
+    "postCreateCommand": "mkdir -p /root/.ssh && chmod 700 /root/.ssh",
+    "postStartCommand": "([ -f /root/.ssh/config ] || printf 'Host github.com\\n\\tStrictHostKeyChecking no\\n' > /root/.ssh/config) && chmod 600 /root/.ssh/config && (chmod 600 /root/.ssh/id_rsa* || true) && (chmod 644 /root/.ssh/*.pub || true)",
     "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/Zephyr_Docker_project,type=bind",
     "workspaceFolder": "/workspaces/Zephyr_Docker_project"
 }

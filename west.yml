@@ -10,29 +10,35 @@ manifest:
 
   projects:
     - name: zephyr
-      revision: v4.1.0
+      revision: v4.4.0
       west-commands: scripts/west-commands.yml
       import:
         name-whitelist:
           - cmsis
+          - cmsis_6
           - hal_nordic
           - hal_stm32
         path-whitelist:
           - modules/hal/cmsis/.*
+          - modules/hal/cmsis_6/.*
           - modules/hal/nordic/.*
           - modules/hal/stm32/.*
 
     - name: cmsis
       path: modules/hal/cmsis
-      revision: d1b8b20b6278615b00e136374540eb1c00dcabe7
+      revision: 512cc7e895e8491696b61f7ba8066b4a182569b8
+
+    - name: cmsis_6
+      path: modules/hal/cmsis_6
+      revision: 30a859f44ef8ab4dc8f84b03ed586fd16ccf9d74
 
     - name: hal_nordic
       path: modules/hal/nordic
-      revision: 37ca068d7b013fb65a2acc9306bffa48a3e72839
+      revision: 44fd3d44b15cb75f80a25b4679f91d2787e28664
 
     - name: hal_stm32
       path: modules/hal/stm32
-      revision: 55043bcc35fffa3b4a8c75a696d932b5020aad09
+      revision: 39130f29ae37c1db34095478ca02b6419b70dcdc
 
   self:
     path: .
