@@ -7,6 +7,7 @@
  */
 #include <zephyr/kernel.h>
 #include <zephyr/drivers/gpio.h>
+#include <zephyr/sys/printk.h>
 
 /* ── Relay feature flag ─────────────────────────────────────────────────────
  * Uncomment the line below to activate relay switching.
@@ -53,12 +54,17 @@ static void set_color(int c)
 K_THREAD_STACK_DEFINE(rgb_stack, RGB_STACK);
 static struct k_thread rgb_tid;
 
+static const char *const color_names[] = {
+    "Red", "Green", "Blue", "Yellow", "Cyan", "Magenta", "White", "Off"
+};
+
 static void rgb_thread(void *p1, void *p2, void *p3)
 {
     int c = 0;
 
     while (1) {
         set_color(c);
+        printk("[RGB] color -> %s\n", color_names[c]);
         c = (c + 1) % ARRAY_SIZE(colors);
         k_msleep(700);
     }
@@ -90,6 +96,7 @@ static void relay_thread(void *p1, void *p2, void *p3)
         for (int i = 0; i < ARRAY_SIZE(relays); i++) {
             gpio_pin_set_dt(&relays[i], on ? 1 : 0);
         }
+        printk("[Relays] all %s\n", on ? "ON" : "OFF");
         k_msleep(1000);
     }
 }
@@ -99,6 +106,10 @@ static void relay_thread(void *p1, void *p2, void *p3)
 
 int main(void)
 {
+    printk("\n*** HCIU Logotherm Main — booted ***\n");
+    printk("Board: %s\n", CONFIG_BOARD);
+    printk("Console: USART1 PA9/PA10 @ 115200 baud\n\n");
+
     /* Initialise green LEDs */
     for (int i = 0; i < ARRAY_SIZE(leds); i++) {
         gpio_pin_configure_dt(&leds[i], GPIO_OUTPUT_INACTIVE);
@@ -127,12 +138,16 @@ int main(void)
                     5, 0, K_NO_WAIT);
 
     /* Main thread: sequential green LED chase at 200 ms per step */
+    printk("[LED] chase started\n");
+    int chase_cycle = 0;
     while (1) {
         for (int i = 0; i < ARRAY_SIZE(leds); i++) {
+            printk("[LED] cycle %d, step %d\n", chase_cycle, i);
             gpio_pin_set_dt(&leds[i], 1);
             k_msleep(200);
             gpio_pin_set_dt(&leds[i], 0);
         }
+        chase_cycle++;
     }
 
     return 0;

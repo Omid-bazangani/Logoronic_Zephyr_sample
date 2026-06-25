@@ -13,7 +13,7 @@
 	compatible = "logotronic,hciu-logotherm-main";
 
 	chosen {
-		zephyr,console = &usart6;
+		zephyr,console = &usart1;
 		zephyr,sram = &sram0;
 		zephyr,flash = &flash0;
 	};
@@ -124,12 +124,15 @@
 	status = "disabled";
 };
 
-&usart6 {
-	/* Moved to PC6/PC7 — PG14 reassigned to relay RS4_1 */
-	pinctrl-0 = <&usart6_tx_pc6 &usart6_rx_pc7>;
+&usart1 {
+	pinctrl-0 = <&usart1_tx_pa9 &usart1_rx_pa10>;
 	pinctrl-names = "default";
 	current-speed = <115200>;
 	status = "okay";
+};
+
+&usart6 {
+	status = "disabled";
 };
 
 &i2c1 {
