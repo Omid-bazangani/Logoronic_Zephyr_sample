@@ -12,15 +12,11 @@ copy_artifacts() {
 }
 
 case "$1" in
-    b_hciu_logotherm_ble)
-        west build -p always -b hciu_logotherm_ble . && copy_artifacts hciu_logotherm_ble
-        ;;
     b_hciu_logotherm_main)
         west build -p always -b hciu_logotherm_main . && copy_artifacts hciu_logotherm_main
         ;;
     *)
         echo "Usage: $0 <target>"
-        echo "  b_hciu_logotherm_ble   -> west build -p always -b hciu_logotherm_ble ."
         echo "  b_hciu_logotherm_main  -> west build -p always -b hciu_logotherm_main ."
         exit 1
         ;;

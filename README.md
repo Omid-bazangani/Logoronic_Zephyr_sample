@@ -37,8 +37,6 @@ west zephyr-export
 
 5. Build the project:
 ```bash
-# BLE chipset
-./build.sh b_hciu_logotherm_ble
 # Main processor (STM32F413ZG)
 ./build.sh b_hciu_logotherm_main
 ```

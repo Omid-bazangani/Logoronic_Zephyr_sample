@@ -3,7 +3,6 @@
 #
 # Usage:
 #   ./flash.sh b_hciu_logotherm_main
-#   ./flash.sh b_hciu_logotherm_ble
 #
 # Connection is chosen automatically:
 #   USB  — JLink forwarded into WSL 2 via usbipd-win (see README)
@@ -87,13 +86,9 @@ case "$1" in
     b_hciu_logotherm_main)
         do_flash "hciu_logotherm_main" "STM32F413ZG" "100"
         ;;
-    b_hciu_logotherm_ble)
-        do_flash "hciu_logotherm_ble" "nRF52833_xxAA" "100"
-        ;;
     *)
         echo "Usage: $0 <target>"
         echo "  b_hciu_logotherm_main   -> STM32F413ZG   via JLink SWD 100 kHz"
-        echo "  b_hciu_logotherm_ble    -> nRF52833_xxAA via JLink SWD 100 kHz"
         exit 1
         ;;
 esac

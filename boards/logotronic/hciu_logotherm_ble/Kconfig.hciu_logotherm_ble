@@ -1,5 +1,0 @@
-# HCIU Logotherm BLE board configuration
-# SPDX-License-Identifier: Apache-2.0
-
-config BOARD_HCIU_LOGOTHERM_BLE
-	select SOC_NRF52810_QFAA
