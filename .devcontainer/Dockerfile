@@ -100,4 +100,29 @@ RUN mkdir -p /root/.ssh && \
     chmod 600 /root/.ssh/config && \
     chown root:root /root/.ssh/config
 
+# ── West workspace ───────────────────────────────────────────────────────────
+# Initialize west once at image-build time so a freshly built container is
+# immediately ready to build, with no manual `west init`/`west update` step.
+# `zephyr` (no explicit path in west.yml) and the HAL modules (path:
+# modules/hal/...) resolve to /workspaces/zephyr and /workspaces/modules,
+# which are siblings of this directory — outside the bind mount that
+# replaces /workspaces/Zephyr_Docker_project at runtime — so this checkout
+# survives container restarts/recreations.
+#
+# Caveat: this is a snapshot taken from west.yml at build time. If west.yml
+# changes (new module, revision bump), the image must be REBUILT — not just
+# reopened/restarted — for `west update` to pick up the change.
+COPY west.yml .
+RUN west init -l . && \
+    west update && \
+    west zephyr-export
+# ────────────────────────────────────────────────────────────────────────────
+
+# Fix Windows (CRLF) line endings on shell scripts in the bind-mounted
+# workspace every time the container starts. See entrypoint.sh for details.
+ENV WORKSPACE_DIR=/workspaces/Zephyr_Docker_project
+COPY .devcontainer/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["/bin/bash"]

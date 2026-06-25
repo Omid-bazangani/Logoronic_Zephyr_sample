@@ -13,32 +13,18 @@ cd Zephyr_Docker_project
 2. Open the project in VS Code with Dev Containers extension installed.
 
 3. Click "Reopen in Container" when prompted, or run the "Dev Containers: Reopen in Container" command.
+   The image build runs `west init`/`west update`/`west zephyr-export` automatically, so the
+   container is ready to build as soon as it starts — no manual west step needed.
+   > If you change `west.yml` (new module, revision bump), you must **rebuild** the container
+   > (`Dev Containers: Rebuild Container`), not just reopen it, for `west update` to pick up the change.
 
-4. Inside the dev container, initialize west with minimal modules:
-```bash
-# Clean up any existing west installation
-cd /workspaces
-rm -rf .west
-cd /workspaces/Zephyr_Docker_project
-rm -rf modules build
-
-# Initialize west with minimal configuration
-west init -l .
-
-# Update only required modules
-west update
-
-# Configure Zephyr modules
-west zephyr-export
-```
-
-5. Build the project:
+4. Build the project:
 ```bash
 # Main processor (STM32F413ZG)
 ./build.sh b_hciu_logotherm_main
 ```
 
-6. Flash the project:
+5. Flash the project:
 ```bash
 ./flash.sh b_hciu_logotherm_main
 ```
@@ -105,11 +91,12 @@ the connection mode on every run:
 
 2. Build and run the dev container:
 ```bash
-docker build -t zephyr-dev .devcontainer
+# Note: context is the project root (".") so the Dockerfile can COPY west.yml
+docker build -t zephyr-dev -f .devcontainer/Dockerfile .
 docker run -it --privileged -v /dev/bus/usb:/dev/bus/usb \
     -v ${PWD}:/workspaces/Zephyr_Docker_project zephyr-dev
 ```
 
-3. Follow steps 4–6 from Option 1.
+3. Follow steps 4–5 from Option 1.
 
 
