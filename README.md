@@ -85,18 +85,13 @@ the connection mode on every run:
 
 ---
 
-### Option 2: Using Docker Directly
+## Known Startup Messages
 
-1. Clone this repository as above.
+### `chmod: cannot access '/root/.ssh/id_rsa*'`
 
-2. Build and run the dev container:
-```bash
-# Note: context is the project root (".") so the Dockerfile can COPY west.yml
-docker build -t zephyr-dev -f .devcontainer/Dockerfile .
-docker run -it --privileged -v /dev/bus/usb:/dev/bus/usb \
-    -v ${PWD}:/workspaces/Zephyr_Docker_project zephyr-dev
-```
+The `postStartCommand` in `devcontainer.json` tries to set permissions on SSH keys, but no keys exist in `/root/.ssh` yet (only a `config` file and `known_hosts`). The `|| true` at the end of the command makes these non-fatal — the container starts normally regardless.
 
-3. Follow steps 4–5 from Option 1.
+If you want to use SSH inside the container (e.g., for `git` over SSH), you need to have your private key at `~/.ssh/id_rsa` on the **host** machine. The `devcontainer.json` bind-mounts your host `~/.ssh` directory into `/root/.ssh` inside the container, so the key will be picked up automatically on the next container start.
 
+---
 

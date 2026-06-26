@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 # Set non-interactive mode for apt
 ENV DEBIAN_FRONTEND=noninteractive
@@ -31,16 +31,28 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gnupg \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python 3.12 via deadsnakes PPA (Zephyr 4.x requires Python >= 3.12)
-RUN add-apt-repository -y ppa:deadsnakes/ppa && \
-    apt-get update && apt-get install -y --no-install-recommends \
-    python3.12 \
-    python3.12-venv \
-    python3.12-dev \
-    && rm -rf /var/lib/apt/lists/* \
-    && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1 \
-    && update-alternatives --set python3 /usr/bin/python3.12 \
-    && curl -sS https://bootstrap.pypa.io/get-pip.py | python3.12
+# Ensure Python >= 3.12 (Zephyr 4.x requirement).
+# Ubuntu 22.04 ships 3.10 and needs the deadsnakes PPA to get 3.12.
+# Ubuntu 24.04+ ships >= 3.12 already, so skip the PPA there — newer Ubuntu
+# releases aren't always built by deadsnakes right away.
+RUN PY3_VER="$(python3 -c 'import sys; print(sys.version_info[0]*100+sys.version_info[1])' 2>/dev/null || echo 0)" && \
+    if [ "$PY3_VER" -lt 312 ]; then \
+        add-apt-repository -y ppa:deadsnakes/ppa && \
+        apt-get update && apt-get install -y --no-install-recommends \
+            python3.12 python3.12-venv python3.12-dev && \
+        rm -rf /var/lib/apt/lists/* && \
+        update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1 && \
+        update-alternatives --set python3 /usr/bin/python3.12 && \
+        curl -sS https://bootstrap.pypa.io/get-pip.py | python3 - --break-system-packages; \
+    else \
+        apt-get update && apt-get install -y --no-install-recommends \
+            python3-venv python3-dev python3-pip && \
+        rm -rf /var/lib/apt/lists/*; \
+    fi
+
+# PEP 668: Ubuntu 24.04+ marks the system Python as "externally managed".
+# Inside Docker there is no risk from bypassing this, so allow pip freely.
+ENV PIP_BREAK_SYSTEM_PACKAGES=1
 
 # Install Zephyr's Python dependencies (jsonschema, pyyaml, pykwalify, west,
 # pyelftools, python-magic, pylink-square, etc.), pinned to the same Zephyr

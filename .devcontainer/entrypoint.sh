@@ -9,6 +9,8 @@ set -e
 if [ -d "$WORKSPACE_DIR" ]; then
     find "$WORKSPACE_DIR" -path '*/.git' -prune -o -type f -name '*.sh' -print \
         -exec sed -i 's/\r$//' {} +
+    find "$WORKSPACE_DIR" -path '*/.git' -prune -o -type f -name '*.sh' -print \
+        -exec chmod +x {} +
 fi
 
 exec "$@"
