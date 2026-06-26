@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "/workspaces/Zephyr_Docker_project/app"
+    "cmake.sourceDirectory": "/workspaces/Zephyr_Docker_project/app",
+    "remote.autoForwardPorts": false
 }
